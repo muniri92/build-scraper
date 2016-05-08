@@ -1,6 +1,7 @@
 import io
 import sys
 import requests
+import geocoder
 from bs4 import BeautifulSoup
 
 
@@ -146,7 +147,17 @@ def generate_results(test=False):
         yield metadata
 
 
+def get_geojson(result):
+    address = " ".join(result.get('Address', ''))
+    if not address:
+        return None
+    geocoded = geocoder.google(address)
+    return geocoded.geojson
+
+
 if __name__ == '__main__':
+    import pprint
     test = len(sys.argv) > 1 and sys.argv[1] == 'test'
     for result in generate_results(test):
-        print result
+        geo_result = get_geojson(result)
+        pprint.pprint(geo_result)
